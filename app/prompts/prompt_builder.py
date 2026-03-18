@@ -1,8 +1,6 @@
 class PromptBuilder:
 
-    def build(self, query: str, context_chunks):
-
-        context = "\n\n".join(context_chunks)
+    def build(self, context: str, query: str):
 
         prompt = f"""
 You are a helpful assistant.

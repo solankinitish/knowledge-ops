@@ -5,11 +5,16 @@ from app.retrieval.vector_store import VectorStore
 from app.retrieval.vector_retrieval import VectorRetriever
 from app.prompts.prompt_builder import PromptBuilder
 from app.llm.llm_client import LLMClient
+from app.utils.logger import get_logger
+
+
 
 
 class ResearchService:
 
     def __init__(self):
+
+        self.logger = get_logger(__name__)
 
         self.extractor = PageExtractor()
         self.chunker = TextChunker()
@@ -21,11 +26,19 @@ class ResearchService:
 
     def process(self, url: str, query: str):
 
+        self.logger.info("Starting research pipeline")
+
+        self.logger.info(f"Query: {query}")
+
         # Step 1: Extract
         text = self.extractor.extract(url)
+        self.logger.info(f"Extracted text length: {len(text)}")
 
         # Step 2: Chunk
         chunks = self.chunker.chunk(text)
+        if not chunks:
+            return "No content extracted."
+        self.logger.info(f"Number of chunks created: {len(chunks)}")
 
         # Step 3: Embed
         embeddings = self.embedder.embed(chunks)
@@ -35,11 +48,18 @@ class ResearchService:
 
         # Step 5: Retrieve
         retrieved_chunks = self.retriever.retrieve(query)
+        if len(retrieved_chunks) == 0:
+            self.logger.info("No relevant context found.")
+            return "I don't know"
+        self.logger.info(f"Retrieved chunks: {len(retrieved_chunks)}")
 
         # Step 6: Build Prompt
-        prompt = self.prompt_builder.build(query, retrieved_chunks)
+        context = "\n".join(retrieved_chunks)
+        prompt = self.prompt_builder.build(context, query)
 
         # Step 7: Generate Answer
+        self.logger.info("Sending prompt to LLM")
         response = self.llm.generate(prompt)
+        self.logger.info("Received response from LLM")
 
         return response

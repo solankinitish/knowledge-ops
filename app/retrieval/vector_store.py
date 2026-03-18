@@ -20,6 +20,12 @@ class VectorStore:
             embeddings=embeddings,
             ids=ids
         )
+
+    def clear(self):
+        all_items = self.collection.get()
+
+        if all_items and "ids" in all_items:
+            self.collection.delete(ids=all_items["ids"])
     
     def search(self, query_embedding, top_k=3):
 
