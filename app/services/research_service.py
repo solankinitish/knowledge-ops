@@ -7,7 +7,7 @@ from app.prompts.prompt_builder import PromptBuilder
 from app.llm.llm_client import LLMClient
 from app.utils.logger import get_logger
 from app.search.search_engine import SearchEngine
-
+from app.processing.query_processor import QueryProcessor
 
 
 
@@ -25,6 +25,9 @@ class ResearchService:
         self.prompt_builder = PromptBuilder()
         self.llm = LLMClient()
         self.search_engine = SearchEngine()
+        self.query_processor = QueryProcessor()
+        # self.score_url = ScoreURL()
+
 
     def process(self, query: str):
 
@@ -33,10 +36,17 @@ class ResearchService:
         self.logger.info(f"Query: {query}")
 
         # Step 1: Searching URLs
-        urls = self.search_engine.search(query)
-        self.logger.info(f"URLs found: {len(urls)}")
+        queries = self.query_processor.process(query)[:2]
 
-        urls = urls[:3]
+        all_urls = []
+
+        for q in queries:
+            urls = self.search_engine.search(q)[:2]
+            all_urls.extend(urls)
+        
+        # urls = sorted(urls, key=score_url, reverse=True)
+        
+        urls = list(set(all_urls))[:3]
 
         # Step 2: Extracting text and forming chunks
         all_chunks = []
@@ -52,6 +62,8 @@ class ResearchService:
             except Exception as e:
                 self.logger.info(f"Failed Url: {url} | Error: {e}")
                 continue
+
+        all_chunks = all_chunks[:50]
     
         if not all_chunks:
             return "I don't know."
