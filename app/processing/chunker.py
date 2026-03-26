@@ -15,6 +15,9 @@ class TextChunker:
         current_chunk = ""
 
         for para in paragraphs:
+            if len(para.strip()) < 50:
+                continue
+
             if len(current_chunk) + len(para) < self.chunk_size:
                 current_chunk += (" " + para)
 

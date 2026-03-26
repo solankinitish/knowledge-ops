@@ -33,6 +33,7 @@ class PageExtractor:
                 text = content.get_text(separator="\n", strip=True)
             else:
                 text = soup.get_text(separator="\n", strip=True)
+                text = self.clean_text(text)
 
             # Return Clean String
             return re.sub(r"\n{3,}", "\n\n", text).strip()
@@ -41,3 +42,26 @@ class PageExtractor:
 
             logger.error(f"Failed to extract {url}: {e}")
             return ""
+    
+    def clean_text(self, text: str) -> str:
+
+        lines = text.split("\n")
+
+        cleaned = []
+
+        for line in lines:
+            line = line.strip()
+
+            if len(line) < 30:
+                if not any(word in line.lower() for word in ["fastapi", "developer", "created", "ramirez"]):
+                    continue
+
+            if "learn how and when to remove" in line.lower():
+                continue
+
+            if "[" in line and "]" in line:
+                continue
+
+            cleaned.append(line)
+        
+        return "\n".join(cleaned)

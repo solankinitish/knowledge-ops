@@ -24,7 +24,7 @@ class VectorStore:
     def clear(self):
         all_items = self.collection.get()
 
-        if all_items and "ids" in all_items:
+        if all_items and "ids" in all_items and len(all_items["ids"]) > 0:
             self.collection.delete(ids=all_items["ids"])
     
     def search(self, query_embedding, top_k=3):
