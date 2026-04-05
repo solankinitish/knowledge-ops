@@ -72,7 +72,8 @@ class ResearchService:
         # Step 3: Embed
         embeddings = self.embedder.embed(all_chunks)
 
-        # Step 4: Store
+        # Step 4: Clear and Store
+        self.vector_store.clear()
         self.vector_store.add(all_chunks, embeddings)
 
         # Step 5: Retrieve
