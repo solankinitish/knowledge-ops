@@ -68,6 +68,8 @@ class ResearchService:
         if not all_chunks:
             return "I don't know."
         self.logger.info(f"Number of chunks created: {len(all_chunks)}")
+        for i, chunk in enumerate(all_chunks):
+            print(f"Chunk {i}: {chunk[:100]}")
 
         # Step 3: Embed
         embeddings = self.embedder.embed(all_chunks)
