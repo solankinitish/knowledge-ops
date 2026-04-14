@@ -2,7 +2,7 @@ from app.services.research_service import ResearchService
 
 service = ResearchService()
 
-query = "What is FastAPI?"
+query = "Who created FastAPI?"
 
 response = service.process(query)
 

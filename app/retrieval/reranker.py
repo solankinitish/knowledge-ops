@@ -19,28 +19,16 @@ class Reranker:
         question_words = ["who", "what", "why", "when", "how", "where"]
         q_type = next((w for w in words if w in question_words), None)
 
-        if q_type == None:
-            query_embedding = self.embedding_service.embed([query])[0]
-            doc_embeddings = self.embedding_service.embed(documents)
-            scores = np.dot(doc_embeddings, query_embedding)
+        # Evaluating Similarity Scores
+        query_embedding = self.embedding_service.embed([query])[0]
+        doc_embeddings = self.embedding_service.embed(documents)
+        s_scores = np.dot(doc_embeddings, query_embedding)
 
-            ranked_indices = np.argsort(scores)[::-1]
 
-            results = []
-
-            for i in ranked_indices:
-                if scores[i] < self.threshold:
-                    continue
-
-                results.append(documents[i])
-
-                if len(results) == top_k:
-                    break
-
-            return results
-        
         results = {}
-        
+
+        # Evaluating h_scores
+        h_scores = []
         for docu in documents:
             score = 0
             doc = nlp(docu)
@@ -97,8 +85,26 @@ class Reranker:
 
                 if has_causals:
                     score += 1
-            results[docu] = score
-        sorted_results = [k for k, v in sorted(results.items(), key=lambda x: x[1], reverse=True)[:3]]
+            
+            if q_type==None:
+                score = 0
+
+            h_scores.append(score)
+
+        
+        # Evaluating Final Scores
+        i = 0
+        for docu in documents:
+            f_score = 0
+            if q_type in ["who", "where", "when"]:
+                f_score = 0.4 * s_scores[i] + 0.6 * h_scores[i]
+            elif q_type in ["what", "how", "why"]:
+                f_score = 0.6 * s_scores[i] + 0.4 * h_scores[i]
+            else:
+                f_score = s_scores[i]
+            results[docu] = f_score
+            i += 1
+
+        sorted_results = [k for k, v in sorted(results.items(), key=lambda x: x[1], reverse=True)[:top_k]]
 
         return sorted_results
-        
