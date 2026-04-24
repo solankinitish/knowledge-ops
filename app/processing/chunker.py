@@ -1,7 +1,7 @@
 
 class TextChunker:
 
-    def __init__(self, chunk_size=400, overlap=80):
+    def __init__(self, chunk_size=1000, overlap=80):
         self.chunk_size = chunk_size
         self.overlap = overlap
 

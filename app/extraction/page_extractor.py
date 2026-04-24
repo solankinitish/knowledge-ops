@@ -28,15 +28,28 @@ class PageExtractor:
             
             # Extract Text
             content = soup.find("div", {"id": "mw-content-text"})
+
+            if not content:
+                content = soup.find("article")
+            if not content:
+                content = soup.find("main")
             
             if content:
                 text = content.get_text(separator="\n", strip=True)
             else:
                 text = soup.get_text(separator="\n", strip=True)
-                text = self.clean_text(text)
+
+            text = self.clean_text(text)
 
             # Return Clean String
-            return re.sub(r"\n{3,}", "\n\n", text).strip()
+            text = re.sub(r"\n{3,}", "\n\n", text).strip()
+
+            if len(text) < 200:
+                return ""
+            if "sign in" in text.lower():
+                return ""
+            
+            return text
         
         except Exception as e:
 
@@ -52,9 +65,8 @@ class PageExtractor:
         for line in lines:
             line = line.strip()
 
-            if len(line) < 30:
-                if not any(word in line.lower() for word in ["fastapi", "developer", "created", "ramirez"]):
-                    continue
+            if len(line) < 50:
+                continue
 
             if "learn how and when to remove" in line.lower():
                 continue
