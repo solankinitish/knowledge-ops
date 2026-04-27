@@ -8,7 +8,9 @@ from app.llm.llm_client import LLMClient
 from app.utils.logger import get_logger
 from app.search.search_engine import SearchEngine
 from app.processing.query_processor import QueryProcessor
+from app.processing.query_planner import QueryPlanner
 
+import time
 
 
 class ResearchService:
@@ -26,6 +28,7 @@ class ResearchService:
         self.llm = LLMClient()
         self.search_engine = SearchEngine()
         self.query_processor = QueryProcessor()
+        self.query_planner = QueryPlanner()
         # self.score_url = ScoreURL()
 
 
@@ -36,14 +39,21 @@ class ResearchService:
         self.logger.info(f"Query: {query}")
 
         # Step 1: Searching URLs
-        queries = self.query_processor.process(query)[:2]
+        sub_ques = self.query_planner.plan(query)
 
         all_urls = []
+        for sub_q in sub_ques:
+            queries = self.query_processor.process(sub_q)[:2]
+            
+            for q in queries:
+                try:
+                    urls = self.search_engine.search(q)[:2]
+                    all_urls.extend(urls)
+                except Exception as e:
+                    self.logger.error(f"Search failed for query: {q} | Error: {e}")
+                    continue
+            time.sleep(1)
 
-        for q in queries:
-            urls = self.search_engine.search(q)[:2]
-            all_urls.extend(urls)
-        
         # urls = sorted(urls, key=score_url, reverse=True)
         
         urls = list(set(all_urls))[:3]
