@@ -9,7 +9,6 @@ from app.utils.logger import get_logger
 from app.search.search_engine import SearchEngine
 from app.processing.query_processor import QueryProcessor
 from app.processing.query_planner import QueryPlanner
-
 import time
 
 
@@ -29,7 +28,6 @@ class ResearchService:
         self.search_engine = SearchEngine()
         self.query_processor = QueryProcessor()
         self.query_planner = QueryPlanner()
-        # self.score_url = ScoreURL()
 
 
     def process(self, query: str):
@@ -40,6 +38,10 @@ class ResearchService:
 
         # Step 1: Searching URLs
         sub_ques = self.query_planner.plan(query)
+        self.logger.info(f"Sub-questions: {sub_ques}")
+
+        if not sub_ques:
+            self.logger.error("No questions framed from the query.")
 
         all_urls = []
         for sub_q in sub_ques:
@@ -53,10 +55,12 @@ class ResearchService:
                     self.logger.error(f"Search failed for query: {q} | Error: {e}")
                     continue
             time.sleep(1)
-
-        # urls = sorted(urls, key=score_url, reverse=True)
         
         urls = list(set(all_urls))[:3]
+        self.logger.info(f"URLs to process: {urls}")
+
+        if not urls:
+            self.logger.error("No URLs found.")
 
         # Step 2: Extracting text and forming chunks
         all_chunks = []
@@ -78,11 +82,10 @@ class ResearchService:
         if not all_chunks:
             return "I don't know."
         self.logger.info(f"Number of chunks created: {len(all_chunks)}")
-        for i, chunk in enumerate(all_chunks):
-            print(f"Chunk {i}: {chunk[:100]}")
 
         # Step 3: Embed
         embeddings = self.embedder.embed(all_chunks)
+        self.logger.info("Chunks embedded.")
 
         # Step 4: Clear and Store
         self.vector_store.clear()
@@ -90,14 +93,18 @@ class ResearchService:
 
         # Step 5: Retrieve
         retrieved_chunks = self.retriever.retrieve(query)
+        self.logger.info(f"Retrieved chunks: {len(retrieved_chunks)}")
+
+        for i, chunk in enumerate(retrieved_chunks):
+            self.logger.info(f"Retrieved chunk {i}: {chunk[:150]}")
         if len(retrieved_chunks) == 0:
             self.logger.info("No relevant context found.")
             return "I don't know"
-        self.logger.info(f"Retrieved chunks: {len(retrieved_chunks)}")
 
         # Step 6: Build Prompt
         context = "\n\n".join(retrieved_chunks[:3])
         prompt = self.prompt_builder.build(context, query)
+        self.logger.info(f"Prompt:\n{prompt}")
 
         # Step 7: Generate Answer
         self.logger.info("Sending prompt to LLM")
