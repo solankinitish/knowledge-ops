@@ -13,6 +13,8 @@ class PromptBuilder:
         extraction_prompt = f"""
 You are a precise question-answering assistant.
 
+IMPORTANT: The context is your only source to frame the answer. If the answer isn't in the context, say "I don't know" — no exceptions.
+
 You must follow these steps strictly:
 
 1. Read all the provided context carefully.
@@ -36,6 +38,8 @@ Answer (concise and direct):
         
         explanation_prompt = f"""
 You are a precise question-answering assistant.
+
+IMPORTANT: The context is your only source to frame the answer. If the answer isn't in the context, say "I don't know" — no exceptions.
 
 You must follow these steps strictly:
 

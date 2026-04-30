@@ -56,7 +56,7 @@ class ResearchService:
                     continue
             time.sleep(1)
         
-        urls = list(set(all_urls))[:3]
+        urls = list(set(all_urls))[:5]
         self.logger.info(f"URLs to process: {urls}")
 
         if not urls:
