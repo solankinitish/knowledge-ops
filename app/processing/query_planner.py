@@ -6,14 +6,6 @@ class QueryPlanner:
     def __init__(self):
         self.llm = LLMClient()
     def plan(self, query: str) -> list[str]:
-        # prompt = f"""
-        # Take this query: {query} and using just the info provided in the query itself,
-        # frame each element into one independent sub-question that is independently
-        # answerable without reference to other part of the query,
-        # extracted from the query,
-        # no extra text before or after. Output only a json array of strings or just with
-        # one entry if the query is a one simple question.
-        # """
         prompt = f"""
         Analyze this query: {query}
 
