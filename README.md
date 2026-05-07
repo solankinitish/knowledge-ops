@@ -49,6 +49,8 @@ It searches the live web, retrieves and ranks the most answerable content, and g
 ---
 
 ## Architecture
+
+```
 User Query
 │
 ▼
@@ -86,10 +88,12 @@ OllamaProvider     — Mistral local
 │
 ▼
 Answer
+```
 
 ---
 
 ## Retrieval Pipeline
+```
 User Query
 ↓
 Query Decomposition (QueryPlanner)
@@ -105,6 +109,7 @@ Hybrid Reranking (Top-3)
 Grounded Prompt → LLM
 ↓
 Answer
+```
 
 ---
 
@@ -188,6 +193,7 @@ python -m scripts.evaluate
 ---
 
 ## Project Structure
+```
 knowledge_ops/
 ├── app/
 │   ├── api/            — FastAPI server and routes
@@ -205,6 +211,7 @@ knowledge_ops/
 ├── main.py
 ├── requirements.txt
 └── .gitignore
+```
 
 ---
 
