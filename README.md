@@ -4,11 +4,10 @@
 ![FastAPI](https://img.shields.io/badge/FastAPI-API-green)
 ![RAG](https://img.shields.io/badge/Architecture-RAG-purple)
 ![Ollama](https://img.shields.io/badge/LLM-Ollama%2FMistral-orange)
-![License](https://img.shields.io/badge/License-MIT-lightgrey)
+![License](https://img.shields.io/badge/MIT-License-lightgrey)
 
 KnowledgeOps is a **web-grounded research engine** built from first principles.  
-It searches the live web, retrieves and ranks the most answerable content, and
-generates grounded answers using a local LLM — without hallucinating.
+It searches the live web, retrieves and ranks the most answerable content, and generates grounded answers using a local LLM — without hallucinating.
 
 ---
 
@@ -16,8 +15,7 @@ generates grounded answers using a local LLM — without hallucinating.
 
 - Building a **multi-hop RAG pipeline from scratch**
 - **Answerability-driven retrieval** — not just semantic similarity
-- **Hybrid reranking** combining cosine similarity with question-type-aware
-  heuristics
+- **Hybrid reranking** combining cosine similarity with question-type-aware heuristics
 - **Query decomposition** using the LLM itself as a planner
 - **Grounding enforcement** to prevent hallucination
 - **Systematic pipeline debugging** with full stage-by-stage logging
@@ -26,69 +24,65 @@ generates grounded answers using a local LLM — without hallucinating.
 
 ## Features
 
-- Multi-hop query decomposition — complex queries broken into independent
-  sub-questions, each retrieved separately
-- Hybrid reranking — cosine similarity + spaCy answerability scoring weighted
-  by question type (who/when/where vs what/how/why)
-- Grounding enforcement — LLM answers only from retrieved context, returns
-  "I don't know" otherwise
-- Fault-tolerant extraction — handles SSL errors, login walls, timeouts,
-  and 403s gracefully
-- Adaptive prompting — extraction mode for entity questions, explanation
-  mode for descriptive questions
-- Full pipeline logging — every stage logged for systematic debugging
+- **Multi-hop query decomposition** — complex queries broken into independent sub-questions, each retrieved separately
+- **Hybrid reranking** — cosine similarity + spaCy answerability scoring weighted by question type (who/when/where vs what/how/why)
+- **Grounding enforcement** — LLM answers only from retrieved context, returns "I don't know" otherwise
+- **Fault-tolerant extraction** — handles SSL errors, login walls, timeouts, and 403s gracefully
+- **Adaptive prompting** — extraction mode for entity questions, explanation mode for descriptive questions
+- **Full pipeline logging** — every stage logged for systematic debugging
 
 ---
 
 ## Tech Stack
 
-- **FastAPI** — API layer
-- **DuckDuckGo (ddgs)** — web search
-- **requests, BeautifulSoup** — page extraction
-- **SentenceTransformers (all-MiniLM-L6-v2)** — embeddings
-- **ChromaDB** — vector store
-- **spaCy (en_core_web_sm)** — answerability heuristics
-- **Ollama / Mistral** — local LLM inference
-- **Python 3.11**
+| Component | Technology |
+|---|---|
+| API | FastAPI, Uvicorn |
+| Search | DuckDuckGo (ddgs) |
+| Extraction | requests, BeautifulSoup |
+| Embeddings | SentenceTransformers (all-MiniLM-L6-v2) |
+| Vector Store | ChromaDB (in-memory) |
+| NLP | spaCy (en_core_web_sm) |
+| LLM | Mistral via Ollama (local) |
+| Language | Python 3.11 |
 
 ---
 
 ## Architecture
-
 User Query
 │
 ▼
-QueryPlanner          — LLM-based decomposition into sub-questions
+QueryPlanner       — LLM-based decomposition into sub-questions
 │
 ▼
-QueryProcessor        — normalize, rewrite, expand per sub-question
+QueryProcessor     — normalize, rewrite, expand per sub-question
 │
 ▼
-SearchEngine          — DuckDuckGo, top 5 URLs after deduplication
+SearchEngine       — DuckDuckGo, top 5 URLs after deduplication
 │
 ▼
-PageExtractor         — article/main targeting, login-wall detection
+PageExtractor      — article/main targeting, login-wall detection
 │
 ▼
-TextChunker           — 1000 char chunks, min line length 50
+TextChunker        — 1000 char chunks, min line length 50
 │
 ▼
-EmbeddingService      — MiniLM, 384-dim vectors
+EmbeddingService   — MiniLM, 384-dim vectors
 │
 ▼
-VectorStore           — ChromaDB in-memory
+VectorStore        — ChromaDB in-memory
 │
 ▼
-VectorRetriever       — Top-10 recall
+VectorRetriever    — Top-10 recall
 │
 ▼
-Reranker              — hybrid cosine + spaCy, question-type weights
+Reranker           — hybrid cosine + spaCy, question-type weights
 │
 ▼
-PromptBuilder         — extraction/explanation mode, grounding enforcement
+PromptBuilder      — extraction/explanation mode, grounding enforcement
 │
 ▼
-OllamaProvider        — Mistral local
+OllamaProvider     — Mistral local
 │
 ▼
 Answer
@@ -159,35 +153,34 @@ Every stage of the pipeline is logged:
 - Full prompt sent to LLM
 - LLM response
 
-This makes systematic debugging possible — any wrong answer can be
-traced to its exact failure stage without guessing.
+This makes systematic debugging possible — any wrong answer can be traced to its exact failure stage without guessing.
 
 ---
 
 ## How to Run
 
-1. Install dependencies:
+**1. Install dependencies**
 ```bash
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
 
-2. Install Ollama and pull Mistral:
+**2. Install Ollama and pull Mistral**
 ```bash
 ollama pull mistral
 ```
 
-3. Start the API server:
+**3. Start the API server**
 ```bash
 uvicorn main:app --reload
 ```
 
-4. Run the interactive test:
+**4. Run the interactive test**
 ```bash
 python -m scripts.test_research_service
 ```
 
-5. Run the evaluation benchmark:
+**5. Run the evaluation benchmark**
 ```bash
 python -m scripts.evaluate
 ```
@@ -217,16 +210,14 @@ knowledge_ops/
 
 ## Known Limitations
 
-- Source reliability is non-deterministic — results vary by run
-- Reranker is heuristic-based — a learned cross-encoder would be stronger
-- ChromaDB is in-memory — no persistence across runs
-- Ollama/Mistral is slow — 10-40s per query, not production-ready
+- **Source reliability** — results vary by run depending on which URLs DuckDuckGo returns and which succeed
+- **Heuristic reranker** — rule-based spaCy scoring, a learned cross-encoder would be significantly stronger
+- **In-memory vector store** — ChromaDB resets on every run, no persistence across sessions
+- **LLM latency** — Ollama/Mistral averages 10-40s per query, not production-ready
+- **Soft grounding** — grounding enforcement relies on prompt instruction, not programmatic verification
 
 ---
 
 ## Summary
 
-KnowledgeOps demonstrates a **production-style web-grounded RAG engine**
-combining live web search, multi-hop query decomposition, hybrid
-answerability-driven reranking, grounding enforcement, and local LLM
-inference — built and understood from first principles.
+KnowledgeOps demonstrates a **production-style web-grounded RAG engine** combining live web search, multi-hop query decomposition, hybrid answerability-driven reranking, grounding enforcement, and local LLM inference — built and understood from first principles.
