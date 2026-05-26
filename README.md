@@ -221,7 +221,7 @@ knowledge_ops/
 - **Heuristic reranker** — rule-based spaCy scoring, a learned cross-encoder would be significantly stronger
 - **In-memory vector store** — ChromaDB resets on every run, no persistence across sessions
 - **LLM latency** — Ollama/Mistral averages 10-40s per query, not production-ready
-- **Soft grounding** — grounding enforcement relies on prompt instruction, not programmatic verification
+- ~~**Soft grounding**~~ — ✅ Fixed: programmatic grounding verification via cosine similarity (threshold 0.7); answers not supported by retrieved context blocked
 
 ---
 

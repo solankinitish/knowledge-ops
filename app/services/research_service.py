@@ -10,6 +10,7 @@ from app.search.search_engine import SearchEngine
 from app.processing.query_processor import QueryProcessor
 from app.processing.query_planner import QueryPlanner
 import time
+import numpy as np
 
 
 class ResearchService:
@@ -28,6 +29,17 @@ class ResearchService:
         self.search_engine = SearchEngine()
         self.query_processor = QueryProcessor()
         self.query_planner = QueryPlanner()
+    
+    def cos_sim(self, v1, v2):
+        return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+    
+    def is_grounded(self, answer: str, retrieved_chunks: list, threshold: float = 0.7) -> bool:
+        combined_context = " ".join(retrieved_chunks[:3])
+        answer_embedding = self.embedder.embed([answer])[0]
+        context_embedding = self.embedder.embed([combined_context])[0]
+        similarity = self.cos_sim(answer_embedding, context_embedding)
+        self.logger.info(f"Grounding score: {similarity:.3f} (threshold: {threshold})")
+        return similarity >= threshold
 
 
     def process(self, query: str):
@@ -110,5 +122,12 @@ class ResearchService:
         self.logger.info("Sending prompt to LLM")
         response = self.llm.generate(prompt)
         self.logger.info("Received response from LLM")
+
+        # Step 8: Grounding Verification
+        self.logger.info("Verifying grounding...")
+        if not self.is_grounded(response, retrieved_chunks):
+            self.logger.info("Answer failed grounding check")
+            return "I don't know - answer couldn't be retrieved from chunks."
+
 
         return response
