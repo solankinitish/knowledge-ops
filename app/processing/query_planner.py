@@ -7,17 +7,17 @@ class QueryPlanner:
         self.llm = LLMClient()
     def plan(self, query: str) -> list[str]:
         prompt = f"""
-        Analyze this query: {query}
+Analyze this query: {query}
 
-        A query contains multiple sub-questions only if it explicitly asks about more than one distinct topic.
+A query contains multiple sub-questions only if it explicitly asks about more than one distinct topic.
 
-        Example of multiple sub-questions: "What is FastAPI and who created it?" -> ["What is FastAPI?", "Who created FastAPI?"]
-        Example of single question: "Who created FastAPI?" -> ["Who created FastAPI?"]
+Rules:
+1. Each sub-question must be a complete, standalone sentence.
+2. Never use pronouns like "he", "she", "it", "they" — always use the explicit entity name from the original query.
+3. Output only the JSON array, no extra text.
 
-        Return a JSON array of complete, meaningful questions extracted from the query.
-        Each question must be a full sentence, not a fragment.
-        Output only the JSON array, no extra text.
-        """
+Return a JSON array of complete, meaningful questions extracted from the query.
+"""
         try:
             response = self.llm.generate(prompt)
             sub_ques = json.loads(response)

@@ -19,8 +19,8 @@ class QueryProcessor:
 
         return list(queries)
 
-    def normalize(self, qeury: str) -> str:
-        return qeury.lower().strip()
+    def normalize(self, query: str) -> str:
+        return query.lower().strip()
     
     def rewrite(self, query: str) -> str:
 
