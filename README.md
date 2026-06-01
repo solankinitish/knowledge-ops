@@ -1,6 +1,7 @@
 # KnowledgeOps
 **Web-grounded multi-hop research engine — live search, hybrid reranking, grounded LLM answer**  
 **80% pass rate on a complex multi-hop benchmark · Built from first principles**
+
 **Input -> Pipeline**
 <img width="1245" height="259" alt="Input" src="https://github.com/user-attachments/assets/e5d5d66f-de2b-496b-8ba5-51c23a940f9a" />
 
