@@ -1,10 +1,12 @@
 # KnowledgeOps
 **Web-grounded multi-hop research engine — live search, hybrid reranking, grounded LLM answer**  
-80% pass rate on a complex multi-hop benchmark · Built from first principles
+**80% pass rate on a complex multi-hop benchmark · Built from first principles**
 **Input -> Pipeline**
-<img width="1881" height="172" alt="Screenshot 2026-06-01 at 11 27 16 AM" src="https://github.com/user-attachments/assets/71950d91-5f12-440c-bf77-72f086cac304" />
+<img width="1245" height="259" alt="Input" src="https://github.com/user-attachments/assets/e5d5d66f-de2b-496b-8ba5-51c23a940f9a" />
+
 **Output**
-<img width="1902" height="455" alt="Screenshot 2026-06-01 at 11 27 35 AM" src="https://github.com/user-attachments/assets/94641f8e-ab90-4800-8f8c-db74ae7bde45" />
+<img width="1228" height="547" alt="Output" src="https://github.com/user-attachments/assets/64d79b91-9db5-4aac-8fd3-822e8e372129" />
+
 
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue)
